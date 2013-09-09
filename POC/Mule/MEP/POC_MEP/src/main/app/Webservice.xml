@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+    <data-mapper:config name="getpostalcodemapping_grf" transformationGraphPath="getpostalcodemapping.grf" doc:name="DataMapper"/>
+    <data-mapper:config name="sendletterrequestmapping_grf" transformationGraphPath="sendletterrequestmapping.grf" doc:name="DataMapper"/>
+
+	
+	
+    <flow name="LetterService" doc:name="LetterService">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8081" path="DataEnricherLetterService" doc:name="DataEnricherLetterService"/>
+        <cxf:proxy-service port="DataEnricherLetterService" namespace="http://embriq.no/enterprise/dataenricherletterservice_v1" service="DataEnricherLetterService" doc:name="DataEnricherLetterService" wsdlLocation="service/DataEnricherLetterService.wsdl" payload="body"/>
+        <mulexml:dom-to-xml-transformer returnClass="java.lang.String" />
+        <enricher doc:name="Message Enricher" target="#[variable:postalPlace]" source="#[xpath://postalPlace]">
+            <flow-ref name="getPostalArea" doc:name="Get PostalArea"/>
+        </enricher>
+        <flow-ref name="sendLetterRequest" doc:name="Send Letter"/>
+    </flow>
+    
+    <sub-flow name="getPostalArea" doc:name="getPostalArea">
+        <data-mapper:transform config-ref="getpostalcodemapping_grf" doc:name="DataMapper"/>
+        <flow-ref name="invokeGetPostalAreaService" doc:name="Invoke GetPostalAreaService"/>
+        <mulexml:dom-to-xml-transformer returnClass="java.lang.String" />
+    </sub-flow>
+    
+    <sub-flow name="invokeGetPostalAreaService" doc:name="invokeGetPostalAreaService">
+        <cxf:proxy-client doc:name="SOAP" enableMuleSoapHeaders="true" payload="body"/>
+         <http:outbound-endpoint exchange-pattern="request-response" host="localhost" port="8088" path="mockLetterServiceSoapBinding" doc:name="LetterService"/>
+    </sub-flow>
+    
+    <sub-flow name="sendLetterRequest" doc:name="sendLetterRequest">
+        <data-mapper:transform config-ref="sendletterrequestmapping_grf" doc:name="DataMapper">
+            <data-mapper:input-arguments>
+                <data-mapper:input-argument key="PostalArea">#[variable:postalPlace]</data-mapper:input-argument>
+            </data-mapper:input-arguments>
+        </data-mapper:transform>
+        <flow-ref name="invokeSendLetterRequestService" doc:name="Invoke SendLetterRequestService"/>
+    </sub-flow>
+    
+    <sub-flow name="invokeSendLetterRequestService" doc:name="invokeSendLetterRequestService">
+        <cxf:proxy-client payload="body" enableMuleSoapHeaders="true" doc:name="SOAP"/>
+        <http:outbound-endpoint exchange-pattern="one-way" host="localhost" port="8088" path="mockLetterServiceSoapBinding" doc:name="LetterService"/>
+    </sub-flow>
+</mule>

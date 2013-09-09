@@ -1,0 +1,23 @@
+<xs:schema 
+	targetNamespace        ="http://posten.no/enterprise/letterservice/getpostalplacebypostalcode_v1" 
+	xmlns                  ="http://posten.no/enterprise/letterservice/getpostalplacebypostalcode_v1" 
+	xmlns:xs               ="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="unqualified" attributeFormDefault="unqualified" > 
+
+	<xs:element name="GetPostalPlaceByPostalCodeRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="postalCode" 		type="xs:string" 	minOccurs="1" 	maxOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="GetPostalPlaceByPostalCodeResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="postalPlace" 		type="xs:string" 	minOccurs="1" 	maxOccurs="1"/>				
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>
