@@ -16,6 +16,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="postalPlace" 		type="xs:string" 	minOccurs="1" 	maxOccurs="1"/>				
+				<xs:element name="postalNumber" 		type="xs:int" 	minOccurs="1" 	maxOccurs="1"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
