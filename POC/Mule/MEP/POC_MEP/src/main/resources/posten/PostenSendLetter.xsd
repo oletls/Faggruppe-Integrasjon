@@ -12,8 +12,7 @@
 				<xs:element name="streetAddress" 	type="xs:string" 	minOccurs="1" 	maxOccurs="1"/>
 				<xs:element name="postalCode" 		type="xs:string" 	minOccurs="1" 	maxOccurs="1"/>
 				<xs:element name="postalPlace" 		type="xs:string" 	minOccurs="1" 	maxOccurs="1"/>
-			
-					<xs:element name="letterTextdaghjgasd" 		type="xs:string" 	minOccurs="1" 	maxOccurs="1"/>
+				<xs:element name="letterTextdaghjgasd" 		type="xs:string" 	minOccurs="1" 	maxOccurs="1"/>
 				<xs:element name="letterTexDFGADtMaster" 		type="xs:string" 	minOccurs="1" 	maxOccurs="1"/>
 			</xs:sequence>
 		</xs:complexType>
